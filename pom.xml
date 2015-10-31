@@ -67,6 +67,10 @@
               <mainClass>io.anserini.util.DumpDocids</mainClass>
               <name>DumpDocids</name>
             </program>
+            <program>
+              <mainClass>io.anserini.search.ScrapeTwitterSearch</mainClass>
+              <name>ScrapeTwitterSearch</name>
+            </program>
           </programs>
         </configuration>
       </plugin>
@@ -217,6 +221,12 @@
       <groupId>com.github.spullara.mustache.java</groupId>
       <artifactId>compiler</artifactId>
       <version>${MUSTACHE_VERSION}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>2.48.0</version>
     </dependency>
 
   </dependencies>
