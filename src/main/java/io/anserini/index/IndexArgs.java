@@ -26,14 +26,14 @@ public class IndexArgs {
 
   // required arguments
 
-  @Option(name = "-input", metaVar = "[Path]", required = true, usage = "Collection Directory")
+  @Option(name = "-input", metaVar = "[path]", required = true, usage = "Collection Directory")
   String input;
 
-  @Option(name = "-index", metaVar = "[Path]", required = true, usage = "Lucene index")
+  @Option(name = "-index", metaVar = "[path]", required = true, usage = "Lucene index")
   String index;
 
-  @Option(name = "-threads", metaVar = "[Number]", required = true, usage = "Number of Threads")
-  int threads;
+  @Option(name = "-threads", metaVar = "[number]", required = false, usage = "Number of Threads")
+  int threads = 1;
 
   // optional arguments
 
