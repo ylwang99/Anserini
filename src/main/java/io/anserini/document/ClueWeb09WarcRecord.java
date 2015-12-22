@@ -48,7 +48,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 
-public final class ClueWeb09WarcRecord {
+public final class ClueWeb09WarcRecord implements WarcRecord {
 
   public static String WARC_VERSION = "WARC/0.18";
   public static String WARC_VERSION_LINE = "WARC/0.18\n";
@@ -171,8 +171,7 @@ public final class ClueWeb09WarcRecord {
    * @return the content byts (w/ the headerBuffer populated)
    * @throws java.io.IOException
    */
-  private static byte[] readNextRecord(DataInputStream in, StringBuilder headerBuffer)
-          throws IOException {
+  static byte[] readNextRecord(DataInputStream in, StringBuilder headerBuffer, String WARC_VERSION) throws IOException {
     if (in == null) {
       return null;
     }
@@ -262,9 +261,9 @@ public final class ClueWeb09WarcRecord {
    * @return a WARC record (or null if eof)
    * @throws java.io.IOException
    */
-  public static ClueWeb09WarcRecord readNextWarcRecord(DataInputStream in) throws IOException {
+  public static ClueWeb09WarcRecord readNextWarcRecord(DataInputStream in, String WARC_VERSION) throws IOException {
     StringBuilder recordHeader = new StringBuilder();
-    byte[] recordContent = readNextRecord(in, recordHeader);
+    byte[] recordContent = readNextRecord(in, recordHeader, WARC_VERSION);
     if (recordContent == null) {
       return null;
     }
@@ -524,6 +523,26 @@ public final class ClueWeb09WarcRecord {
 
   public String getDisplayContentType() {
     return "text/html";
+  }
+
+  @Override
+  public String id() {
+    return getDocid();
+  }
+
+  @Override
+  public String type() {
+    return getHeaderRecordType();
+  }
+
+  @Override
+  public String content() {
+    return getContent();
+  }
+
+  @Override
+  public String url() {
+    return getURL();
   }
 
   /**
