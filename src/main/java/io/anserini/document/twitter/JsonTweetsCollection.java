@@ -3,6 +3,7 @@ package io.anserini.document.twitter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.kohsuke.args4j.CmdLineException;
@@ -30,6 +31,7 @@ public class JsonTweetsCollection implements Iterable<Status> {
         return path.getName().endsWith(".gz") ? true : false;
       }
     });
+    Arrays.sort(files);
 
     if (files.length == 0) {
       throw new IOException(file + " does not contain any .gz files!");

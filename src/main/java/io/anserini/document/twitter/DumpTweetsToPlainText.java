@@ -26,6 +26,9 @@ public class DumpTweetsToPlainText {
 
     @Option(name = "-docids", metaVar = "[file]", required = true, usage = "output file for docids")
     public String docids;
+    
+    @Option(name = "-percentage", metaVar = "[arg]", required = false, usage = "percentage of collection")
+    public int percentage = 100;
   }
 
   public static void main(String[] argv) throws IOException {
@@ -45,17 +48,29 @@ public class DumpTweetsToPlainText {
 
     FileWriter collection = new FileWriter(args.collection);
     FileWriter docids = new FileWriter(args.docids);
-
+    
     int cnt = 0;
     JsonTweetsCollection tweets = new JsonTweetsCollection(new File(args.input));
     for (Status tweet : tweets) {
       cnt++;
-
+    }
+    tweets.close();
+    
+    int percentage = args.percentage;
+    int stopIndex = Math.min((int)(Math.ceil(percentage * 1.0 / 100 * cnt)), cnt);
+    
+    tweets = new JsonTweetsCollection(new File(args.input));
+    cnt = 0;
+    for (Status tweet : tweets) {
+      cnt ++;
       docids.write(cnt + " " + tweet.getId() + "\n");
       collection.write(cnt + " " + joiner.join(AnalyzerUtils.tokenize(analyzer, tweet.getText())) + "\n");
 
       if ( cnt % 100000 == 0) {
         System.out.println("Processed " + cnt + " tweets.");
+      }
+      if (cnt == stopIndex) {
+      	break;
       }
     }
 
