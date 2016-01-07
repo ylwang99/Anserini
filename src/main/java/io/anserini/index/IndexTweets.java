@@ -93,6 +93,7 @@ public class IndexTweets {
   private static final String DELETES_OPTION = "deletes";
   private static final String OPTIMIZE_OPTION = "optimize";
   private static final String STORE_TERM_VECTORS_OPTION = "store";
+  private static final String PERCENTAGE_OPTION = "percentage";
 
   @SuppressWarnings("static-access")
   public static void main(String[] args) throws Exception {
@@ -110,6 +111,8 @@ public class IndexTweets {
         .withDescription("file with deleted tweetids").create(DELETES_OPTION));
     options.addOption(OptionBuilder.withArgName("id").hasArg()
         .withDescription("max id").create(MAX_ID_OPTION));
+    options.addOption(OptionBuilder.withArgName("arg").hasArg()
+            .withDescription("number of parts").create(PERCENTAGE_OPTION));
 
     CommandLine cmdline = null;
     CommandLineParser parser = new GnuParser();
@@ -183,15 +186,25 @@ public class IndexTweets {
     }
 
     StatusStream stream = new JsonStatusCorpusReader(file);
-
-    Directory dir = FSDirectory.open(Paths.get(indexPath));
-    final IndexWriterConfig config = new IndexWriterConfig(ANALYZER);
-
-    config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-
-    IndexWriter writer = new IndexWriter(dir, config);
     int cnt = 0;
     Status status;
+    while ((status = stream.next()) != null) {
+        if (status.getText() == null) {
+          continue;
+        }
+        cnt ++;
+    }
+    stream.close();
+    
+    int percentage = cmdline.hasOption(PERCENTAGE_OPTION) ? Integer.parseInt(cmdline.getOptionValue(PERCENTAGE_OPTION)): 100;
+    int stopIndex = Math.min((int)(Math.ceil(percentage * 1.0 / 100 * cnt)), cnt); 
+    
+    stream = new JsonStatusCorpusReader(file);
+    Directory dir = FSDirectory.open(Paths.get(indexPath));
+    final IndexWriterConfig config = new IndexWriterConfig(ANALYZER);
+    config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+    IndexWriter writer = new IndexWriter(dir, config);
+    cnt = 0;
     try {
       while ((status = stream.next()) != null) {
         if (status.getText() == null) {
@@ -243,6 +256,9 @@ public class IndexTweets {
         writer.addDocument(doc);
         if (cnt % 100000 == 0) {
           LOG.info(cnt + " statuses indexed");
+        }
+        if (cnt == stopIndex) {
+        	break;
         }
       }
 
