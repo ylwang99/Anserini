@@ -19,6 +19,7 @@ package io.anserini.document.twitter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Arrays;
 
 import com.google.common.base.Preconditions;
 
@@ -44,6 +45,7 @@ public class JsonStatusCorpusReader implements StatusStream {
         return path.getName().endsWith(".gz") ? true : false;
       }
     });
+    Arrays.sort(files);
 
     if (files.length == 0) {
       throw new IOException(file + " does not contain any .gz files!");
